@@ -98,7 +98,7 @@ function login(username, password) {
     }
 
     // Test if password includes at least 1 lowercase letter.
-    if (password === password.toUpperCase) {
+    if (password === password.toUpperCase()) {
         throw new Error('Password must include at least 1 lowercase letter.');
     }
 
@@ -120,15 +120,15 @@ function login(username, password) {
 // Test the login(username, password) Unit.
 function testLogin() {
     // Cases that should pass:
-    login(xXEdgyUsernameXx, Password123);
-    login(PresJoeyB, ChocIceCream1);
-    login(XD, aB0);
+    login('xXEdgyUsernameXx', 'Password123');
+    login('PresJoeyB', 'ChocIceCream1');
+    login('XD', 'aB0');
 
     // Cases that should fail:
-    login(a, a);
-    login(NoLowerCase, BOOMER1);
-    login(NoUpperCase, boomer1);
-    login(NumberHater, NoNumsAllowed);
+    login('a', 'a');
+    login('NoLowerCase', 'BOOMER1');
+    login('NoUpperCase', 'boomer1');
+    login('NumberHater', 'NoNumsAllowed');
 }
 
 testLogin();
