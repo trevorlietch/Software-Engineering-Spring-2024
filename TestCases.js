@@ -79,3 +79,56 @@ function testGetUser()
 }
 
 testGetUser();
+
+// Unit: login(username, password)
+function login(username, password) {
+    // Test if username and password are strings.
+    if (typeof username !== 'string' || typeof password !== 'string') {
+        throw new Error('Username and password must be strings.');
+    }
+
+    // Test if username meets the length requirements.
+    if (username.length <= 1 || username.length > 20) {
+        throw new Error('Username must be longer than 1 character but shorter than 20 characters.');
+    }
+
+    // Test if password meets the length requirements.
+    if (password.length < 3 || password.length > 20) {
+        throw new Error('Password must be at least 3 characters long but shorter than 20 characters.');
+    }
+
+    // Test if password includes at least 1 lowercase letter.
+    if (password === password.toUpperCase) {
+        throw new Error('Password must include at least 1 lowercase letter.');
+    }
+
+    // Test if password includes at least 1 uppercase letter.
+    if (password === password.toLowerCase()) {
+        throw new Error('Password must include at least 1 uppercase letter.');
+    }
+
+    // Test if password includes at least 1 number.
+    if (/\d/.test(password) == false) {
+        throw new Error('Password must include at least 1 number.');
+    }
+
+    // If all tests pass, return a message indicating the inputs are valid.
+    let result = username + ' and ' + password + ' are valid inputs.';
+    return { result };
+}
+
+// Test the login(username, password) Unit.
+function testLogin() {
+    // Cases that should pass:
+    login(xXEdgyUsernameXx, Password123);
+    login(PresJoeyB, ChocIceCream1);
+    login(XD, aB0);
+
+    // Cases that should fail:
+    login(a, a);
+    login(NoLowerCase, BOOMER1);
+    login(NoUpperCase, boomer1);
+    login(NumberHater, NoNumsAllowed);
+}
+
+testLogin();
