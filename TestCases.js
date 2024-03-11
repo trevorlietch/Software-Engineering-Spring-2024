@@ -234,3 +234,30 @@ function testLogin() {
 }
 
 testLogin();
+
+// Jest test case
+function LeaderBoard()
+{
+
+
+describe('JSON string validation', () => {
+    test('should contain a string with 0 to 500 characters', () => {
+        // Directly define the JSON data
+        const jsonData = {
+            "inputString": "This is a test string to check if the length is within the specified range of 0 to 500 characters."
+        };
+
+        // Check if jsonData has the key 'inputString'
+        expect(jsonData).toHaveProperty('inputString');
+
+        // Assuming jsonData.inputString is the string you want to validate
+        const inputString = jsonData.inputString;
+
+        // Check if inputString is a string and its length is between 0 to 500 characters
+        expect(typeof inputString).toBe('string');
+        expect(inputString.length).toBeGreaterThanOrEqual(0);
+        expect(inputString.length).toBeLessThanOrEqual(500);
+    });
+})
+
+};
