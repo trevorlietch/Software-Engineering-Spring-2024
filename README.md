@@ -27,7 +27,7 @@ Welcome to our project! This is a location-based group chat application that all
 ## Setup
 To run this project, you'll need Node.js and npm installed on your computer. From your command line:
 
-1. Clone this repo to your local machine using `https://github.com/yourName/yourProject.git`
+1. Clone this repo to your local machine using `git clone https://github.com/trevorlietch/Software-Engineering-Spring-2024/`
 2. `cd` into the repo
 3. Install the project's dependencies using `npm install`
 4. Start the server using `npm start`
