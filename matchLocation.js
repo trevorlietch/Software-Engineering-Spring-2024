@@ -4,6 +4,8 @@
 // Test cases are provided below
 // Authors: @camilgosmanov
 
+// we need a new feature
+
 // Validate coordinates
 function validateCoordinates(lat, lon) {
   const validLatRange = [-90, 90]; // Valid latitude range (-90 to 90 degrees)
