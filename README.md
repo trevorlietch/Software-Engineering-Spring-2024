@@ -1,6 +1,4 @@
-Sure, I can help with that. Here's an improved version of your README with added technology versions:
 
-```markdown
 # Location-Based Group Chat with Mini Games and Leaderboard
 
 ## Table of Contents
@@ -44,4 +42,4 @@ We appreciate contributions from the community. If you wish to contribute, pleas
 
 ## License
 This project is licensed under the MIT License. For more details, please see the **LICENSE** file.
-'''
+
