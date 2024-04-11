@@ -1,3 +1,7 @@
+// Author: Jaiden
+// Task #9
+
+// Home.js
 import React from 'react';
 
 function Home() {
