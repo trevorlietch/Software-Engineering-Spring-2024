@@ -8,7 +8,8 @@
     
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="This map displays other users' locations within a selected proximity of the current user." />
-    <meta name="author" content="Wyatt Paradise" /><meta name="version" content="1.0" />
+    <meta name="author" content="Wyatt Paradise" />
+    <meta name="version" content="1.0" />
 
     <!-- Add references to the Azure Maps Map control JavaScript and CSS files. -->
     <link href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.css" rel="stylesheet" />
@@ -66,12 +67,38 @@
                         userShape.setProperties(geoPosition);
                     }
 
-                    //Center the map on the users position.
+                    // Center the map based on the selected zoom level.
+                    var zoomLevel = document.getElementById('zoomLevel').value;
+                    var zoom;
+                    switch (zoomLevel) {
+                        case '200ft':
+                            zoom = 19;
+                            break;
+                        case '500ft':
+                            zoom = 18;
+                            break;
+                        case '800ft':
+                            zoom = 17;
+                            break;
+                        case '0.25mi':
+                            zoom = 15;
+                            break;
+                        case '0.5mi':
+                            zoom = 14;
+                            break;
+                        case '1mi':
+                            zoom = 13;
+                            break;
+                        case '2mi':
+                            zoom = 12;
+                            break;
+                        default:
+                            zoom = 15; // Default to a reasonable zoom level
+                            break;
+                    }
                     map.setCamera({
                         center: userPosition,
-                        zoom: 15 
-// NEED TO CHANGE THIS TO ACCURATELY REFLECT USER CHOICE
-
+                        zoom: zoom
                     });
                 }, function (error) {
                     //If an error occurs when trying to access the users position information, display an error message.
@@ -108,13 +135,23 @@
     <div id="myMap" style="position:relative;width:100%;min-width:290px;height:600px;"></div>
 
     <div style="position:absolute;top:15px;left:15px;background-color:white;padding:10px;border-radius:10px;">
+        <label for="zoomLevel">Select Zoom Level:</label>
+        <select id="zoomLevel">
+            <option value="200ft">200ft</option>
+            <option value="500ft">500ft</option>
+            <option value="800ft">800ft</option>
+            <option value="0.25mi">0.25mi</option>
+            <option value="0.5mi">0.5mi</option>
+            <option value="1mi">1mi</option>
+            <option value="2mi">2mi</option>
+        </select>
         <input type="button" value="Start Continuous Tracking" onclick="startTracking()" />
         <input type="button" value="Stop Continuous Tracking" onclick="stopTracking()" />
     </div>
 
     <fieldset style="width:calc(100% - 30px);min-width:290px;margin-top:10px;">
         <legend>Continuous User Position Tracking</legend>
-       
+        
     </fieldset>
 </body>
 </html>
