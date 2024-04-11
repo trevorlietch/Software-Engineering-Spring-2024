@@ -12,6 +12,7 @@
 
 ## Introduction
 Welcome to our project! We've developed a location-based group chat application that not only allows users to interact with each other in real-time but also includes mini-games and a leaderboard to enhance user engagement and foster a sense of community.
+![Designer](https://github.com/trevorlietch/Software-Engineering-Spring-2024/assets/92610400/9dde60cf-0d1e-4cc5-b866-99910cba462c)
 
 ## Features
 - **Location-Based Group Chat**: Users can join chat rooms that are specific to their geographical location, fostering local communities.
