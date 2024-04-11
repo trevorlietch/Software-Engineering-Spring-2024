@@ -1,3 +1,7 @@
+// Author: Jaiden
+// Task #9
+
+// Register.js
 import React, { useState } from 'react';
 
 function Register({ onSuccess }) { // Receive onSuccess as a prop
