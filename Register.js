@@ -1,19 +1,15 @@
-// Register.js
 import React, { useState } from 'react';
 
-function Register() {
-  // State variables for email and password inputs
+function Register({ onSuccess }) { // Receive onSuccess as a prop
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Perform registration logic here (e.g., send data to server)
+    // Perform registration logic here
     console.log('Registered with:', email, password);
-    // Clear input fields after submission
-    setEmail('');
-    setPassword('');
+    // Call onSuccess function passed from the parent component
+    onSuccess();
   };
 
   return (
