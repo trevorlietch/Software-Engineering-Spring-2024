@@ -7,10 +7,8 @@
     <link rel="shortcut icon" href="/favicon.ico" />
     
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="This sample shows how to continuously get the users position information from the browser by using the HTML5 geolocation API and update it on a map." />
-    <meta name="keywords" content="Microsoft maps, map, gis, API, SDK, geolocation, user, location, position, tracking, gps, gps tracking" />
-    <meta name="author" content="Microsoft Azure Maps" /><meta name="version" content="1.0" />
-    <meta name="screenshot" content="screenshot.jpg" />
+    <meta name="description" content="This map displays other users' locations within a selected proximity of the current user." />
+    <meta name="author" content="Wyatt Paradise" /><meta name="version" content="1.0" />
 
     <!-- Add references to the Azure Maps Map control JavaScript and CSS files. -->
     <link href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.css" rel="stylesheet" />
@@ -28,17 +26,13 @@
                 authOptions: {
                     //Use Azure Active Directory authentication.
                     authType: 'anonymous',
-                    clientId: 'b20cad9b-3730-4e54-86e1-82740394dbd7', //Your Azure Maps client id for accessing your Azure Maps account.
+                    clientId: 'b20cad9b-3730-4e54-86e1-82740394dbd7', //Azure Maps client id for accessing our Azure Maps account.
                     getToken: function (resolve, reject, map) {
                         //URL to your authentication service that retrieves an Azure Active Directory Token.
                         var tokenServiceUrl = "https://samples.azuremaps.com/api/GetAzureMapsToken";
 
                         fetch(tokenServiceUrl).then(r => r.text()).then(token => resolve(token));
                     }
-
-                    //Alternatively, use an Azure Maps key. Get an Azure Maps key at https://azure.com/maps. NOTE: The primary key should be used as the key.
-                    //authType: 'subscriptionKey',
-                    //subscriptionKey: '[YOUR_AZURE_MAPS_KEY]'
                 }
             });
 
@@ -75,7 +69,9 @@
                     //Center the map on the users position.
                     map.setCamera({
                         center: userPosition,
-                        zoom: 15
+                        zoom: 15 
+// NEED TO CHANGE THIS TO ACCURATELY REFLECT USER CHOICE
+
                     });
                 }, function (error) {
                     //If an error occurs when trying to access the users position information, display an error message.
@@ -118,7 +114,7 @@
 
     <fieldset style="width:calc(100% - 30px);min-width:290px;margin-top:10px;">
         <legend>Continuous User Position Tracking</legend>
-        This sample shows how to continuously get the users position information from the browser by using the HTML5 geolocation API and update it on a map.
+       
     </fieldset>
 </body>
 </html>
