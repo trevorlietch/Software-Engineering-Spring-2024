@@ -1,3 +1,6 @@
+// Author: Jaiden
+// Task #9
+
 import React, { useState } from 'react';
 import './App.css'; // Import CSS for styling
 
