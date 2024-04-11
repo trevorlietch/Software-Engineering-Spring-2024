@@ -14,20 +14,23 @@ function Login({ onSuccess }) { // Receive onSuccess as a prop
 
   return (
     <div>
-      <h2>Login</h2>
+      <h2>Login</h2> {/* Header for the login form */}
       <form onSubmit={handleSubmit}>
+        {/* Input field for email */}
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
+        {/* Input field for password */}
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+        {/* Submit button */}
         <button type="submit">Login</button>
       </form>
     </div>
