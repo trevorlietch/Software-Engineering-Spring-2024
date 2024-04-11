@@ -1,3 +1,6 @@
+// Author: Jaiden
+// Task #9
+
 // Chat.js
 import React from 'react';
 
