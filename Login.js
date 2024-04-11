@@ -1,3 +1,7 @@
+// Author: Jaiden
+// Task #9
+
+// Login.js
 import React, { useState } from 'react';
 
 function Login({ onSuccess }) { // Receive onSuccess as a prop
