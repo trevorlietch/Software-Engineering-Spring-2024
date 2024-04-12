@@ -31,15 +31,15 @@ To get this project up and running, you'll need Node.js and npm installed on you
 
 1. Clone this repository to your local machine using `git clone https://github.com/trevorlietch/Software-Engineering-Spring-2024/`
 2. Navigate into the repository using `cd Software-Engineering-Spring-2024`
-3. Install the project's dependencies using `npm install`
-4. Start the server using `npm start`
+3. Install the project's dependencies using `brew install`
+4. Start the server using `node index.js`
 5. Open your browser and navigate to `http://localhost:3000`
 
 ## Usage
 Once you've set up the project, you can join a chat room based on your location. Engage in conversations with other users in the same room, participate in mini games, and watch as your scores get updated on the leaderboard.
 
 ## Contributing
-We appreciate contributions from the community. If you wish to contribute, please take a moment to review our **Contributing Guidelines**.
+
 
 ## License
 This project is licensed under the MIT License. For more details, please see the **LICENSE** file.
