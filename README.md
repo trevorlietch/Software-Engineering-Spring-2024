@@ -75,8 +75,5 @@ To get this project up and running, follow these steps:
 ## Usage
 Once you've set up the project, you can join a chat room based on your location. Engage in conversations with other users in the same room, participate in mini-games, and watch as your scores get updated on the leaderboard. Visit [wemoo.lol](http://wemoo.lol) to access the website.
 
-## Contributing
-Feel free to contribute to our project by submitting pull requests or reporting issues. We welcome any enhancements or bug fixes!
-
 ## License
 This project is licensed under the MIT License. For more details, please see the **LICENSE** file.
