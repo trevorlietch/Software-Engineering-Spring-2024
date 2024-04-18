@@ -3,6 +3,9 @@
  @license
  Copyright 2019 Google LLC. All Rights Reserved.
  SPDX-License-Identifier: Apache-2.0
+ DISCLAIMER: This code is from Google's API to implement their maps software. 
+ The user tracking and positioning, as well as the map view elements to increase/decrease
+ the view range, were implemented by Wyatt Paradise
 -->
 <html>
   <head>
@@ -20,7 +23,7 @@
         height: 100%;
       }
 
-      /* Optional: Makes the sample page fill the window. */
+      /*Makes the sample page fill the window. */
       html,
       body {
         height: 100%;
@@ -48,57 +51,81 @@
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
 
     <script>
-      /**
-       * @license
-       * Copyright 2019 Google LLC. All Rights Reserved.
-       * SPDX-License-Identifier: Apache-2.0
-       */
-      // Note: This example requires that you consent to location sharing when
-      // prompted by your browser. If you see the error "The Geolocation service
-      // failed.", it means you probably did not give permission for the browser to
-      // locate you.
+      // Global variables to store map and info window instances
       let map, infoWindow;
 
+      // Global variable to store the selected range
+      let selectedRange = 0;
+
       function initMap() {
+        // Initialize map and info window
         map = new google.maps.Map(document.getElementById("map"), {
           center: { lat: 35.205894, lng: -97.445717 },
-          zoom: 15,
+          zoom: 16,
         });
         infoWindow = new google.maps.InfoWindow();
 
+        // Add "Pan to Current Location" button
         const locationButton = document.createElement("button");
-
         locationButton.textContent = "Pan to Current Location";
         locationButton.classList.add("custom-map-control-button");
-        map.controls[google.maps.ControlPosition.TOP_CENTER].push(
-          locationButton
-        );
-        locationButton.addEventListener("click", () => {
-          // Try HTML5 geolocation.
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-              (position) => {
-                const pos = {
-                  lat: position.coords.latitude,
-                  lng: position.coords.longitude,
-                };
+        map.controls[google.maps.ControlPosition.TOP_CENTER].push(locationButton);
 
-                infoWindow.setPosition(pos);
-                infoWindow.setContent("Location found.");
-                infoWindow.open(map);
-                map.setCenter(pos);
-              },
-              () => {
-                handleLocationError(true, infoWindow, map.getCenter());
-              }
-            );
-          } else {
-            // Browser doesn't support Geolocation
-            handleLocationError(false, infoWindow, map.getCenter());
-          }
+        // Add event listener to the button for getting user's current location
+        locationButton.addEventListener("click", () => {
+          getUserLocation();
+        });
+
+        // Add dropdown menu for selecting range
+        const rangeSelector = document.createElement("select");
+        rangeSelector.innerHTML = `
+          <option value="0">Select Range</option>
+          <option value="200">200 ft</option>
+          <option value="750">750 ft</option>
+          <option value="1609">1 mile</option>
+        `;
+        rangeSelector.classList.add("custom-map-control-button");
+        map.controls[google.maps.ControlPosition.TOP_CENTER].push(rangeSelector);
+
+        // Add event listener to the range selector
+        rangeSelector.addEventListener("change", () => {
+          selectedRange = parseInt(rangeSelector.value);
+          // Update map markers based on the selected range
+          updateMarkers();
         });
       }
 
+      // Function to get user's current location
+      function getUserLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const userPos = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              };
+
+              // Display user's location on the map
+              const userMarker = new google.maps.Marker({
+                position: userPos,
+                map: map,
+                title: "Your Location",
+              });
+
+              // Center map on user's location
+              map.setCenter(userPos);
+            },
+            () => {
+              handleLocationError(true, infoWindow, map.getCenter());
+            }
+          );
+        } else {
+          // Browser doesn't support Geolocation
+          handleLocationError(false, infoWindow, map.getCenter());
+        }
+      }
+
+      // Function to handle location errors
       function handleLocationError(browserHasGeolocation, infoWindow, pos) {
         infoWindow.setPosition(pos);
         infoWindow.setContent(
@@ -109,11 +136,67 @@
         infoWindow.open(map);
       }
 
+      // Function to update map markers based on selected range
+      function updateMarkers() {
+        // Adjust the following logic based on how you store user positions in your application
+        for (let i = 0; i < userMarkers.length; i++) {
+          userMarkers[i].setMap(null);
+        }
+        userMarkers = [];
+
+        // Update map zoom level based on the selected range
+        if (selectedRange === 0) {
+          // If no range is selected, reset to default zoom level
+          map.setZoom(15);
+        } else {
+          // Calculate and set appropriate zoom level based on selected range
+          const zoomLevel = getZoomLevel(selectedRange);
+          map.setZoom(zoomLevel);
+        }
+
+        // Filter and display other users within the selected range
+        const userPos = map.getCenter(); // Get the center of the map
+        for (let i = 0; i < userPositions.length; i++) {
+          const user = userPositions[i];
+          const distance = google.maps.geometry.spherical.computeDistanceBetween(
+            new google.maps.LatLng(user.lat, user.lng),
+            new google.maps.LatLng(userPos.lat(), userPos.lng())
+          );
+          // Convert selected range to meters
+          const selectedRangeMeters = selectedRange * 0.3048;
+          if (distance <= selectedRangeMeters) {
+            // Display user within the selected range
+            const userMarker = new google.maps.Marker({
+              position: user,
+              map: map,
+              title: "Other User",
+            });
+            userMarkers.push(userMarker);
+          }
+        }
+      }
+
+      // Function to calculate zoom level based on the selected range
+      function getZoomLevel(range) {
+        // Adjust this function according to your desired zoom level calculation
+        // This is a simple example, you may need to fine-tune it based on your requirements
+        if (range <= 200) {
+          return 18; // Adjust the zoom level as needed
+        } else if (range <= 750) {
+          return 16; // Adjust the zoom level as needed
+        } else {
+          return 14; // Adjust the zoom level as needed
+        }
+      }
+
+      
+      // Expose the initMap function to the global scope
       window.initMap = initMap;
     </script>
   </head>
   <body>
     <div id="map"></div>
+    <!-- Load Google Maps API with callback to initMap -->
     <script
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDm-ArKttbnMcFJn5glWhrjMJZXHQU0DTQ&callback=initMap&v=weekly&solution_channel=GMP_CCS_geolocation_v1"
       defer
