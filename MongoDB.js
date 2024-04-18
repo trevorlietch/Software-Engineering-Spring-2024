@@ -56,37 +56,43 @@ insertUser();
 
 const chatRoomDataBizzell = {
   "building": "Bizzell",
-  "chatRoomID": "bizzell1"
+  "chatRoomID": "bizzell1",
+  "location": "35.20805, -97.44589"
 };
 
 // Define chat room data for Dale Hall
 const chatRoomDataDaleHall = {
   "building": "Dale Hall",
-  "chatRoomID": "dale1"
+  "chatRoomID": "dale1",
+  "location": "35.20429, -97.44664"
 };
 
 // data for Gallogly Hall
 const chatRoomDataGalloglyHall = {
   "building": "Gallogly Hall",
-  "chatRoomID": "gallogly1"
+  "chatRoomID": "gallogly1",
+  "location": "35.21018, -97.44226"
 };
 
 // data for Devon Energy Hall
 const chatRoomDataDevonEnergyHall = {
   "building": "Devon Energy Hall",
-  "chatRoomID": "devon1"
+  "chatRoomID": "devon1",
+  "location": "35.21076, -97.44180"
 };
 
 // data for Physical Science Center
 const chatRoomDataPhysicalScienceCenter = {
   "building": "Physical Science Center",
-  "chatRoomID": "physicalscience1"
+  "chatRoomID": "physicalscience1",
+  "location": "35.20931, -97.44727"
 };
 
 // data for Sarkeys Energy Center
 const chatRoomDataSarkeysEnergyCenter = {
   "building": "SarkeysEnergyCenter",
-  "chatRoomID": "sarkeysenergy1"
+  "chatRoomID": "sarkeysenergy1",
+  "location": ""
 }
 
 async function insertChatRooms() {
@@ -108,13 +114,13 @@ async function insertChatRooms() {
     console.log('Inserted chat room at Gallagly Hall:', resultGallogly.insertedId);
 
     const resultDevon = await db.collection('Chat Rooms').insertOne(chatRoomDataDevonEnergyHall);
-    console.log('Inserted chat room at Dale Hall:', resultDevon.insertedId);
+    console.log('Inserted chat room at Devon Energy:', resultDevon.insertedId);
 
     const resultPhysicalScienceCenter = await db.collection('Chat Rooms').insertOne(chatRoomDataPhysicalScienceCenter);
-    console.log('Inserted chat room at Dale Hall:', resultPhysicalScienceCenter.insertedId);
+    console.log('Inserted chat room at Physical Science Center:', resultPhysicalScienceCenter.insertedId);
 
     const resultSarkeysEnergy = await db.collection('Chat Rooms').insertOne(chatRoomDataSarkeysEnergyCenter);
-    console.log('Inserted chat room at Dale Hall:', resultSarkeysEnergy.insertedId);
+    console.log('Inserted chat room at Sarkeys Energy:', resultSarkeysEnergy.insertedId);
   } 
   catch (error) 
   {
