@@ -9,8 +9,10 @@ const dbName = 'Wemoo';
 // Define user data for me as an example
 // there will be further tests to make sure username, password, 
 // and email are all meeting requirements
+// these are the documents withing the User collection
 const userData = 
 {
+  "userID": "000001",
   "username": "TrevorTheDog",
   "password": "password123",
   "email": "trevorlietch@ou.edu",   
@@ -51,3 +53,79 @@ async function insertUser()
 
 // Call the insertUser function to insert the user document
 insertUser();
+
+const chatRoomDataBizzell = {
+  "building": "Bizzell",
+  "chatRoomID": "bizzell1"
+};
+
+// Define chat room data for Dale Hall
+const chatRoomDataDaleHall = {
+  "building": "Dale Hall",
+  "chatRoomID": "dale1"
+};
+
+// data for Gallogly Hall
+const chatRoomDataGalloglyHall = {
+  "building": "Gallogly Hall",
+  "chatRoomID": "gallogly1"
+};
+
+// data for Devon Energy Hall
+const chatRoomDataDevonEnergyHall = {
+  "building": "Devon Energy Hall",
+  "chatRoomID": "devon1"
+};
+
+// data for Physical Science Center
+const chatRoomDataPhysicalScienceCenter = {
+  "building": "Physical Science Center",
+  "chatRoomID": "physicalscience1"
+};
+
+// data for Sarkeys Energy Center
+const chatRoomDataSarkeysEnergyCenter = {
+  "building": "SarkeysEnergyCenter",
+  "chatRoomID": "sarkeysenergy1"
+}
+
+async function insertChatRooms() {
+  const client = new MongoClient(url);
+  try 
+  {
+    await client.connect();
+    console.log('Connected to MongoDB');
+
+    const db = client.db(dbName);
+
+    const resultBizzell = await db.collection('Chat Rooms').insertOne(chatRoomDataBizzell);
+    console.log('Inserted chat room at Bizzell:', resultBizzell.insertedId);
+
+    const resultDaleHall = await db.collection('Chat Rooms').insertOne(chatRoomDataDaleHall);
+    console.log('Inserted chat room at Dale Hall:', resultDaleHall.insertedId);
+
+    const resultGallogly = await db.collection('Chat Rooms').insertOne(chatRoomDataGalloglyHall);
+    console.log('Inserted chat room at Gallagly Hall:', resultGallogly.insertedId);
+
+    const resultDevon = await db.collection('Chat Rooms').insertOne(chatRoomDataDevonEnergyHall);
+    console.log('Inserted chat room at Dale Hall:', resultDevon.insertedId);
+
+    const resultPhysicalScienceCenter = await db.collection('Chat Rooms').insertOne(chatRoomDataPhysicalScienceCenter);
+    console.log('Inserted chat room at Dale Hall:', resultPhysicalScienceCenter.insertedId);
+
+    const resultSarkeysEnergy = await db.collection('Chat Rooms').insertOne(chatRoomDataSarkeysEnergyCenter);
+    console.log('Inserted chat room at Dale Hall:', resultSarkeysEnergy.insertedId);
+  } 
+  catch (error) 
+  {
+    console.error('Error inserting chat rooms:', error);
+  } 
+  finally 
+  {
+    await client.close();
+    console.log('Disconnected from MongoDB');
+  }
+}
+
+// Call the insertChatRooms function
+insertChatRooms();
