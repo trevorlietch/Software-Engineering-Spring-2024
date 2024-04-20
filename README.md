@@ -1,4 +1,5 @@
-# Location-Based Group Chat with Mini Games and Leaderboard
+# Wemoo
+## Location-Based Group Chat with Mini Games and Leaderboard
 
 ## Table of Contents
 1. [Introduction](#introduction)
