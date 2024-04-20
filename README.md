@@ -28,7 +28,7 @@ Welcome to our project! We've developed a location-based group chat application 
 
 ## Website
 
-[wemoo.lol](wemoo.lol)
+**[wemoo.lol](https://www.wemoo.lol)
 
 ## Setup
 To get this project up and running, follow these steps:
