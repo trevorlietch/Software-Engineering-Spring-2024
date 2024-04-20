@@ -1,6 +1,10 @@
 # Wemoo
 ## Location-Based Group Chat with Mini Games and Leaderboard
 
+## Site URL
+
+[wemoo.lol](https://wemoo.lol)
+
 ## Table of Contents
 1. [Introduction](#introduction)
 2. [Features](#features)
@@ -25,10 +29,6 @@ Welcome to our project! We've developed a location-based group chat application 
 - Socket.IO v4.1.3
 - HTML5/CSS3
 - JavaScript ES6
-
-## Website
-
-[wemoo.lol](https://wemoo.lol)
 
 ## Setup
 To get this project up and running, follow these steps:
