@@ -3,7 +3,7 @@ Realtime chat app with websockets using Node.js, Express and Socket.io with Vani
 
 ## Usage
 ```
-1. cd to the directory containing `server.js`
+1. cd to the root directory (the one containing `server.js`)
 
 2. Run the following in terminal:
 
