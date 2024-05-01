@@ -28,13 +28,12 @@ let db = new sqlite3.Database('./messages.db', (err) => {
   console.log('Connected to the messages database.');
 
   // Create table here
-  db.run('CREATE TABLE IF NOT EXISTS messages(user text, message text)', (err) => {
+  db.run('CREATE TABLE IF NOT EXISTS messages(user text, message text, room text)', (err) => {
     if (err) {
       console.error(err.message);
     }
   });
 });
-
 
 // Run when client connects
 io.on("connection", (socket) => {
@@ -42,6 +41,16 @@ io.on("connection", (socket) => {
     const user = userJoin(socket.id, username, room);
 
     socket.join(user.room);
+
+    // Fetch and send previous messages in the room
+    db.all(`SELECT * FROM messages WHERE room = ?`, [user.room], (err, rows) => {
+      if (err) {
+        throw err;
+      }
+      rows.forEach((row) => {
+        socket.emit("message", formatMessage(row.user, row.message));
+      });
+    });
 
     // Welcome current user
     socket.emit("message", formatMessage(botName, "Welcome to Wemoo!"));
@@ -66,7 +75,7 @@ io.on("connection", (socket) => {
     const user = getCurrentUser(socket.id);
 
     // Store message in SQLite database
-    db.run(`INSERT INTO messages(user, message) VALUES(?, ?)`, [user.username, msg], function(err) {
+    db.run(`INSERT INTO messages(user, message, room) VALUES(?, ?, ?)`, [user.username, msg, user.room], function(err) {
       if (err) {
         return console.log(err.message);
       }
