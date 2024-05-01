@@ -92,7 +92,7 @@ const chatRoomDataPhysicalScienceCenter = {
 const chatRoomDataSarkeysEnergyCenter = {
   "building": "SarkeysEnergyCenter",
   "chatRoomID": "sarkeysenergy1",
-  "location": ""
+  "location": "35.2104, -97.44044"
 }
 
 async function insertChatRooms() {

@@ -1,45 +1,100 @@
-const express = require('express');
-const { MongoClient } = require('mongodb');
+const path = require("path");
+const http = require("http");
+const express = require("express");
+const socketio = require("socket.io");
+const formatMessage = require("./messages");
+const sqlite3 = require('sqlite3').verbose();
+const {
+  userJoin,
+  getCurrentUser,
+  userLeave,
+  getRoomUsers,
+} = require("./users");
 
 const app = express();
-const port = 3000;
+const server = http.createServer(app);
+const io = socketio(server);
 
-// MongoDB Connection URL
-const url = 'mongodb://localhost:27017';
-// Database Name
-const dbName = 'Wemoo';
+// Set static folder
+app.use(express.static(path.join(__dirname, "public")));
 
-// Create an Express route for registration
-app.post('/register', async (req, res) => {
-  // Extract registration data from the request body
-  const { email, password } = req.body;
+const botName = "Wemoo Bot";
 
-  // Connect to MongoDB
-  const client = new MongoClient(url);
-  try {
-    await client.connect();
-    console.log('Connected to MongoDB');
-
-    // Specify the database to access Wemoo
-    const db = client.db(dbName);
-
-    // Insert user data into the 'users' collection
-    const result = await db.collection('users').insertOne({ email, password });
-    console.log('User registered:', result.insertedId);
-
-    // Send a success response
-    res.status(200).send('User registered successfully');
-  } catch (error) {
-    console.error('Error registering user:', error);
-    // Send an error response
-    res.status(500).send('An error occurred while registering user');
-  } finally {
-    // Close the MongoDB connection
-    await client.close();
-    console.log('Disconnected from MongoDB');
+// Initialize SQLite database
+let db = new sqlite3.Database('./messages.db', (err) => {
+  if (err) {
+    console.error(err.message);
   }
+  console.log('Connected to the messages database.');
+
+  // Create table here
+  db.run('CREATE TABLE IF NOT EXISTS messages(user text, message text)', (err) => {
+    if (err) {
+      console.error(err.message);
+    }
+  });
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+
+// Run when client connects
+io.on("connection", (socket) => {
+  socket.on("joinRoom", ({ username, room }) => {
+    const user = userJoin(socket.id, username, room);
+
+    socket.join(user.room);
+
+    // Welcome current user
+    socket.emit("message", formatMessage(botName, "Welcome to Wemoo!"));
+
+    // Broadcast when a user connects
+    socket.broadcast
+      .to(user.room)
+      .emit(
+        "message",
+        formatMessage(botName, `${user.username} has joined the chat`)
+      );
+
+    // Send users and room info
+    io.to(user.room).emit("roomUsers", {
+      room: user.room,
+      users: getRoomUsers(user.room),
+    });
+  });
+
+  // Listen for chatMessage
+  socket.on("chatMessage", (msg) => {
+    const user = getCurrentUser(socket.id);
+
+    // Store message in SQLite database
+    db.run(`INSERT INTO messages(user, message) VALUES(?, ?)`, [user.username, msg], function(err) {
+      if (err) {
+        return console.log(err.message);
+      }
+      console.log(`A row has been inserted with rowid ${this.lastID}`);
+    });
+
+    io.to(user.room).emit("message", formatMessage(user.username, msg));
+  });
+
+  // Runs when client disconnects
+  socket.on("disconnect", () => {
+    const user = userLeave(socket.id);
+
+    if (user) {
+      io.to(user.room).emit(
+        "message",
+        formatMessage(botName, `${user.username} has left the chat`)
+      );
+
+      // Send users and room info
+      io.to(user.room).emit("roomUsers", {
+        room: user.room,
+        users: getRoomUsers(user.room),
+      });
+    }
+  });
 });
+
+const PORT = process.env.PORT || 8080;
+
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
