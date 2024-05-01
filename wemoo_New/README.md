@@ -3,9 +3,13 @@ Realtime chat app with websockets using Node.js, Express and Socket.io with Vani
 
 ## Usage
 ```
-npm install
-npm run dev
+1. cd to the directory containing `server.js`
 
-Go to localhost:3000
+2. Run the following in terminal:
+
+npm install
+npm run
+
+3. Go to localhost:8080 on any browser
 ```
 
