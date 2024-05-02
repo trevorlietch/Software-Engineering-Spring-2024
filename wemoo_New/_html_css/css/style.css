@@ -29,6 +29,12 @@ a {
 	text-decoration: none;
 }
 
+.background {
+	background-image: url(pasture.png);
+	background-size: cover;
+	background-position: center;
+}
+
 .btn {
 	cursor: pointer;
 	padding: 5px 15px;
