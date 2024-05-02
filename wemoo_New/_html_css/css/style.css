@@ -30,7 +30,7 @@ a {
 }
 
 .background {
-	background-image: url(pasture.png);
+	background-image: url("wemoo_New/_html_css/pasture.jpg");
 	background-size: cover;
 	background-position: center;
 }
