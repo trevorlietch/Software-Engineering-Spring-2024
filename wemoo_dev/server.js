@@ -4,6 +4,8 @@ const express = require("express");
 const socketio = require("socket.io");
 const formatMessage = require("./utils/messages");
 const sqlite3 = require('sqlite3').verbose();
+const nodemailer = require('nodemailer');
+const bodyParser = require('body-parser');
 const {
   userJoin,
   getCurrentUser,
@@ -15,10 +17,26 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+
+// parse application/json
+app.use(bodyParser.json())
+
+
 // Set static folder
 app.use(express.static(path.join(__dirname, "public")));
 
 const botName = "Wemoo Bot";
+
+//Add emailer 
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'wemoo.service@gmail.com',
+    pass: 'qwca yphp nyst rprx' // Use the generated application-specific password here
+  }
+});
 
 // Initialize SQLite database
 let db = new sqlite3.Database('./messages.db', (err) => {
@@ -71,6 +89,21 @@ io.on("connection", (socket) => {
     io.to(user.room).emit("roomUsers", {
       room: user.room,
       users: getRoomUsers(user.room),
+    });
+
+    let mailOptions = {
+      from: 'wemoo.service@gmail.com',
+      to: user.username, // assuming you have an email field in your user object
+      subject: 'Join the chat',
+      text: 'Click on the link to join the chat: http://wemoo.lol'
+    };
+
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
     });
   });
 
