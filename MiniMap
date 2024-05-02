@@ -1,157 +1,178 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Continuous User Position Tracking - Azure Maps Web SDK Samples</title>
+<!--
+ @license
+ Copyright 2019 Google LLC. All Rights Reserved.
+ SPDX-License-Identifier: Apache-2.0
+ DISCLAIMER: This code is from Google's API to implement their maps software. 
+ The user tracking and positioning, as well as the map view elements to increase/decrease
+ the view range, were implemented by Wyatt Paradise
+-->
+<html>
+  <head>
+    <style>
+      /**
+       * @license
+       * Copyright 2019 Google LLC. All Rights Reserved.
+       * SPDX-License-Identifier: Apache-2.0
+       */
+      /** 
+       * Always set the map height explicitly to define the size of the div element
+       * that contains the map. 
+       */
+      #map {
+        height: 100%;
+      }
 
-    <meta charset="utf-8" />
-    <link rel="shortcut icon" href="/favicon.ico" />
-    
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="This map displays other users' locations within a selected proximity of the current user." />
-    <meta name="author" content="Wyatt Paradise" />
-    <meta name="version" content="1.0" />
+      /* Makes the sample page fill the window. */
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
 
-    <!-- Add references to the Azure Maps Map control JavaScript and CSS files. -->
-    <link href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.css" rel="stylesheet" />
-    <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.js"></script>
+      .custom-map-control-button {
+        background-color: #fff;
+        border: 0;
+        border-radius: 2px;
+        box-shadow: 0 1px 4px -1px rgba(0, 0, 0, 0.3);
+        margin: 10px;
+        padding: 0 0.5em;
+        font: 400 18px Roboto, Arial, sans-serif;
+        overflow: hidden;
+        height: 40px;
+        cursor: pointer;
+      }
+      .custom-map-control-button:hover {
+        background: rgb(235, 235, 235);
+      }
+    </style>
+    <title>Geolocation</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
 
     <script>
-        var map, watchId, datasource, userShape;
+      // Global variables to store map and info window instances
+      let map, infoWindow;
 
-        function GetMap() {
-            //Initialize a map instance.
-            map = new atlas.Map('myMap', {
-                view: 'Auto',
+      // Global variable to store the selected range
+      let selectedRange = 0;
 
-                //Add authentication details for connecting to Azure Maps.
-                authOptions: {
-                    //Use Azure Active Directory authentication.
-                    authType: 'anonymous',
-                    clientId: 'b20cad9b-3730-4e54-86e1-82740394dbd7', //Azure Maps client id for accessing our Azure Maps account.
-                    getToken: function (resolve, reject, map) {
-                        //URL to your authentication service that retrieves an Azure Active Directory Token.
-                        var tokenServiceUrl = "https://samples.azuremaps.com/api/GetAzureMapsToken";
+      function initMap() {
+        // Initialize map and info window
+        map = new google.maps.Map(document.getElementById("map"), {
+          center: { lat: 35.205894, lng: -97.445717 },
+          zoom: 16,
+        });
+        infoWindow = new google.maps.InfoWindow();
 
-                        fetch(tokenServiceUrl).then(r => r.text()).then(token => resolve(token));
-                    }
-                }
-            });
+        // Get user's current location
+        getUserLocation();
+      }
 
-            //Wait until the map resources are ready.
-            map.events.add('ready', function () {
-                //Create a data source and add it to the map.
-                datasource = new atlas.source.DataSource();
-                map.sources.add(datasource);
+      // Function to get user's current location
+      function getUserLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const userPos = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              };
 
-                //Add a layer for rendering the users location as a symbol.
-                map.layers.add(new atlas.layer.SymbolLayer(datasource));
-            });
-        }
+              // Display user's location on the map
+              const userMarker = new google.maps.Marker({
+                position: userPos,
+                map: map,
+                title: "Your Location",
+              });
 
-        function startTracking() {
-            if (!watchId) {
-                //Watch the users position.
-                watchId = navigator.geolocation.watchPosition(function (geoPosition) {
-
-                    //Get the coordinate information from the geoPosition.
-                    var userPosition = [geoPosition.coords.longitude, geoPosition.coords.latitude];
-
-                    //TIP: altitude? in meters, speed? in meters/second and heading? in degrees are also potential properties of geoPosition.coords
-
-                    if (!userShape) {
-                        //Create a shape to show the users position and add it to the data source.
-                        userShape = new atlas.Shape(new atlas.data.Feature(new atlas.data.Point(userPosition), geoPosition));
-                        datasource.add(userShape);
-                    } else {
-                        userShape.setCoordinates(userPosition);
-                        userShape.setProperties(geoPosition);
-                    }
-
-                    // Center the map based on the selected zoom level.
-                    var zoomLevel = document.getElementById('zoomLevel').value;
-                    var zoom;
-                    switch (zoomLevel) {
-                        case '200ft':
-                            zoom = 19;
-                            break;
-                        case '500ft':
-                            zoom = 18;
-                            break;
-                        case '800ft':
-                            zoom = 17;
-                            break;
-                        case '0.25mi':
-                            zoom = 15;
-                            break;
-                        case '0.5mi':
-                            zoom = 14;
-                            break;
-                        case '1mi':
-                            zoom = 13;
-                            break;
-                        case '2mi':
-                            zoom = 12;
-                            break;
-                        default:
-                            zoom = 15; // Default to a reasonable zoom level
-                            break;
-                    }
-                    map.setCamera({
-                        center: userPosition,
-                        zoom: zoom
-                    });
-                }, function (error) {
-                    //If an error occurs when trying to access the users position information, display an error message.
-                    switch (error.code) {
-                        case error.PERMISSION_DENIED:
-                            alert('User denied the request for Geolocation.');
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            alert('Position information is unavailable.');
-                            break;
-                        case error.TIMEOUT:
-                            alert('The request to get user position timed out.');
-                            break;
-                        case error.UNKNOWN_ERROR:
-                            alert('An unknown error occurred.');
-                            break;
-                    }
-                });
+              // Center map on user's location
+              map.setCenter(userPos);
+            },
+            () => {
+              handleLocationError(true, infoWindow, map.getCenter());
             }
+          );
+        } else {
+          // Browser doesn't support Geolocation
+          handleLocationError(false, infoWindow, map.getCenter());
+        }
+      }
+
+      // Function to handle location errors
+      function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(
+          browserHasGeolocation
+            ? "Error: The Geolocation service failed."
+            : "Error: Your browser doesn't support geolocation."
+        );
+        infoWindow.open(map);
+      }
+
+      // Function to update map markers based on selected range
+      function updateMarkers() {
+        // Clear existing markers
+        for (let i = 0; i < userMarkers.length; i++) {
+          userMarkers[i].setMap(null);
+        }
+        userMarkers = [];
+
+        // Update map zoom level and center based on the selected range
+        const userPos = map.getCenter(); // Get the center of the map
+        if (selectedRange === 0) {
+          // If no range is selected, reset to default zoom level
+          map.setZoom(16);
+        } else {
+          // Calculate and set appropriate zoom level based on selected range
+          const zoomLevel = getZoomLevel(selectedRange);
+          map.setZoom(zoomLevel);
         }
 
-        function stopTracking() {
-            //Cancel the geolocation updates.
-            navigator.geolocation.clearWatch(watchId);
-
-            //Clear all data from the map.
-            datasource.clear();
-            userShape = null;
-            watchId = null;
+        // Filter and display other users within the selected range
+        for (let i = 0; i < userPositions.length; i++) {
+          const user = userPositions[i];
+          const distance = google.maps.geometry.spherical.computeDistanceBetween(
+            new google.maps.LatLng(user.lat, user.lng),
+            new google.maps.LatLng(userPos.lat(), userPos.lng())
+          );
+          // Convert selected range to meters
+          const selectedRangeMeters = selectedRange * 0.3048;
+          if (distance <= selectedRangeMeters) {
+            // Display user within the selected range
+            const userMarker = new google.maps.Marker({
+              position: user,
+              map: map,
+              title: "Other User",
+            });
+            userMarkers.push(userMarker);
+          }
         }
+      }
+
+
+      // Function to calculate zoom level based on the selected range
+      function getZoomLevel(range) {
+        if (range <= 200) {
+          zoom = 18; // Adjust the zoom level as needed
+        } else if (range <= 750) {
+          zoom = 16; // Adjust the zoom level as needed
+        } else {
+          zoom = 14; // Adjust the zoom level as needed
+        }
+      }
+
+      
+      // Expose the initMap function to the global scope
+      window.initMap = initMap;
     </script>
-</head>
-<body onload="GetMap()">
-    <div id="myMap" style="position:relative;width:100%;min-width:290px;height:600px;"></div>
-
-    <div style="position:absolute;top:15px;left:15px;background-color:white;padding:10px;border-radius:10px;">
-        <label for="zoomLevel">Select Zoom Level:</label>
-        <select id="zoomLevel">
-            <option value="200ft">200ft</option>
-            <option value="500ft">500ft</option>
-            <option value="800ft">800ft</option>
-            <option value="0.25mi">0.25mi</option>
-            <option value="0.5mi">0.5mi</option>
-            <option value="1mi">1mi</option>
-            <option value="2mi">2mi</option>
-        </select>
-        <input type="button" value="Start Continuous Tracking" onclick="startTracking()" />
-        <input type="button" value="Stop Continuous Tracking" onclick="stopTracking()" />
-    </div>
-
-    <fieldset style="width:calc(100% - 30px);min-width:290px;margin-top:10px;">
-        <legend>Continuous User Position Tracking</legend>
-        
-    </fieldset>
-</body>
+  </head>
+  <body>
+    <div id="map"></div>
+    <!-- Load Google Maps API with callback to initMap -->
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDm-ArKttbnMcFJn5glWhrjMJZXHQU0DTQ&callback=initMap&v=weekly&solution_channel=GMP_CCS_geolocation_v1"
+      defer
+    ></script>
+  </body>
 </html>
