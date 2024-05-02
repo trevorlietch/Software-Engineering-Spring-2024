@@ -13,6 +13,12 @@
     <title>Wemoo App</title>
 
     <style>
+      body {
+        background-image: ('pasture.jpg');
+        background-size: 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
       /**
        * @license
        * Copyright 2019 Google LLC. All Rights Reserved.
@@ -28,7 +34,7 @@
       } /** Set map container to square shape */
     </style>
 </head>
-<body>
+<body> <!-- Chat container here. This is where the main chat window is held and hosted.-->
     <div class="chat-container">
       <header class="chat-header">
         <h1><i class="fas fa-smile"></i> Wemoo</h1> <!--Main header-->
@@ -36,7 +42,7 @@
       </header>
       <main class="chat-main">
         <div class="chat-sidebar">
-          <h3><i class="fas fa-comments"></i> Room Name:</h3> <!--Create headers in sidebar-->
+          <h3><i class="fas fa-comments"></i> Room Name:</h3> <!--Create headers in the chat sidebar-->
           <h2 id="room-name"></h2>
           <h3><i class="fas fa-users"></i> Users</h3>
           <ul id="users"></ul>
@@ -63,7 +69,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/main.js"></script>
 
-    <script>
+    <script> 
       let map;
 
       function initMap() {
@@ -75,7 +81,7 @@
         getUserLocation();
       }
 
-      function getUserLocation() {
+      function getUserLocation() { // User location determined and collected here, converted into longitude and latitude coordinates.
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -113,7 +119,7 @@
         });
       }
 
-      function handleLocationError(browserHasGeolocation, map, pos) {
+      function handleLocationError(browserHasGeolocation, map, pos) { // In case location cannot be determined. Calculated here, generic map (first method) displayed from above.
         var infoWindow = new google.maps.InfoWindow();
         infoWindow.setPosition(pos);
         infoWindow.setContent(
@@ -124,7 +130,7 @@
         infoWindow.open(map);
       }
 
-      function loadMapScript() {
+      function loadMapScript() { // Pull OU location GoogleMaps API key to load map data.
         var script = document.createElement("script");
         script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDm-ArKttbnMcFJn5glWhrjMJZXHQU0DTQ&callback=initMap&v=weekly&solution_channel=GMP_CCS_geolocation_v1"; // API Key I had to register & create
         script.defer = true;
