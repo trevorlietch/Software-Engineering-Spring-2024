@@ -6,6 +6,7 @@ const formatMessage = require("./utils/messages");
 const sqlite3 = require('sqlite3').verbose();
 const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
+const { v4: uuidv4 } = require('uuid');
 const {
   userJoin,
   getCurrentUser,
@@ -23,20 +24,10 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-
 // Set static folder
 app.use(express.static(path.join(__dirname, "public")));
 
 const botName = "Wemoo Bot";
-
-//Add emailer 
-let transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'wemoo.service@gmail.com',
-    pass: 'qwca yphp nyst rprx' // Use the generated application-specific password here
-  }
-});
 
 // Initialize SQLite database
 let db = new sqlite3.Database('./messages.db', (err) => {
@@ -51,7 +42,57 @@ let db = new sqlite3.Database('./messages.db', (err) => {
       console.error(err.message);
     }
   });
+
+  // Create table for users
+  db.run('CREATE TABLE IF NOT EXISTS users(uuid text, email text)', (err) => {
+    if (err) {
+      console.error(err.message);
+    }
+  });
 });
+
+//Add email for new index.html
+app.post('/sendmail', (req, res) => {
+  let uniqueId = uuidv4();
+  let uniqueUrl = `http://wemoo.lol/chat/${uniqueId}`;
+
+  let mailOptions = {
+    from: 'wemoo.service@gmail.com',
+    to: req.body.email,
+    subject: 'Join the chat',
+    text: `Click on the link to join the chat: ${uniqueUrl}`
+  };
+
+  transporter.sendMail(mailOptions, function(error, info){
+    if (error) {
+      console.log(error);
+      res.send(error);
+    } else {
+      console.log('Email sent: ' + info.response);
+
+      // Insert the UUID and email into the database
+      db.run(`INSERT INTO users(uuid, email) VALUES(?, ?)`, [uniqueId, req.body.email], function(err) {
+        if (err) {
+          return console.log(err.message);
+        }
+        console.log(`A row has been inserted with rowid ${this.lastID}`);
+      });
+
+      res.send('Email sent: ' + info.response);
+    }
+  });
+});
+
+//Add emailer 
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'wemoo.service@gmail.com',
+    pass: 'qwca yphp nyst rprx' // Use the generated application-specific password here
+  }
+});
+
+
 
 
 // Add max user limit
@@ -69,22 +110,6 @@ io.on("connection", (socket) => {
       socket.emit("message", formatMessage(botName, "Sorry, this room is full. Please try another one."));
       return;
     }
-
-    let mailOptions = {
-      from: 'wemoo.service@gmail.com',
-      to: username, // assuming you have an email field in your user object
-      subject: 'Join the chat',
-      text: 'Click on the link to join the chat: http://wemoo.lol'
-    };
-
-    transporter.sendMail(mailOptions, function(error, info){
-      if (error) {
-        console.log(error);
-        return;
-      } else {
-        console.log('Email sent: ' + info.response);
-      }
-    });
   
     const user = userJoin(socket.id, username, room);
   
@@ -108,6 +133,16 @@ io.on("connection", (socket) => {
     });
 
   });
+
+  // Add uuid based chat pages
+  app.get('/chat/:uuid', (req, res) => {
+    // Extract the uuid from the URL
+    const uuid = req.params.uuid;
+  
+    // Render the chat page
+    res.render('chat', { uuid });
+  });
+  
 
 let lastMessageTimestamps = {};
 
@@ -174,6 +209,8 @@ let lastMessageTimestamps = {};
     }
   });
 });
+
+
 
 const PORT = process.env.PORT || 8080;
 
