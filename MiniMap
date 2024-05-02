@@ -23,7 +23,7 @@
         height: 100%;
       }
 
-      /*Makes the sample page fill the window. */
+      /* Makes the sample page fill the window. */
       html,
       body {
         height: 100%;
@@ -65,34 +65,8 @@
         });
         infoWindow = new google.maps.InfoWindow();
 
-        // Add "Pan to Current Location" button
-        const locationButton = document.createElement("button");
-        locationButton.textContent = "Pan to Current Location";
-        locationButton.classList.add("custom-map-control-button");
-        map.controls[google.maps.ControlPosition.TOP_CENTER].push(locationButton);
-
-        // Add event listener to the button for getting user's current location
-        locationButton.addEventListener("click", () => {
-          getUserLocation();
-        });
-
-        // Add dropdown menu for selecting range
-        const rangeSelector = document.createElement("select");
-        rangeSelector.innerHTML = `
-          <option value="0">Select Range</option>
-          <option value="200">200 ft</option>
-          <option value="750">750 ft</option>
-          <option value="1609">1 mile</option>
-        `;
-        rangeSelector.classList.add("custom-map-control-button");
-        map.controls[google.maps.ControlPosition.TOP_CENTER].push(rangeSelector);
-
-        // Add event listener to the range selector
-        rangeSelector.addEventListener("change", () => {
-          selectedRange = parseInt(rangeSelector.value);
-          // Update map markers based on the selected range
-          updateMarkers();
-        });
+        // Get user's current location
+        getUserLocation();
       }
 
       // Function to get user's current location
@@ -138,16 +112,17 @@
 
       // Function to update map markers based on selected range
       function updateMarkers() {
-        // Adjust the following logic based on how you store user positions in your application
+        // Clear existing markers
         for (let i = 0; i < userMarkers.length; i++) {
           userMarkers[i].setMap(null);
         }
         userMarkers = [];
 
-        // Update map zoom level based on the selected range
+        // Update map zoom level and center based on the selected range
+        const userPos = map.getCenter(); // Get the center of the map
         if (selectedRange === 0) {
           // If no range is selected, reset to default zoom level
-          map.setZoom(15);
+          map.setZoom(16);
         } else {
           // Calculate and set appropriate zoom level based on selected range
           const zoomLevel = getZoomLevel(selectedRange);
@@ -155,7 +130,6 @@
         }
 
         // Filter and display other users within the selected range
-        const userPos = map.getCenter(); // Get the center of the map
         for (let i = 0; i < userPositions.length; i++) {
           const user = userPositions[i];
           const distance = google.maps.geometry.spherical.computeDistanceBetween(
@@ -176,16 +150,15 @@
         }
       }
 
+
       // Function to calculate zoom level based on the selected range
       function getZoomLevel(range) {
-        // Adjust this function according to your desired zoom level calculation
-        // This is a simple example, you may need to fine-tune it based on your requirements
         if (range <= 200) {
-          return 18; // Adjust the zoom level as needed
+          zoom = 18; // Adjust the zoom level as needed
         } else if (range <= 750) {
-          return 16; // Adjust the zoom level as needed
+          zoom = 16; // Adjust the zoom level as needed
         } else {
-          return 14; // Adjust the zoom level as needed
+          zoom = 14; // Adjust the zoom level as needed
         }
       }
 
