@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /> <!-- Center header to match window size-->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css"
@@ -25,22 +25,23 @@
       .map-container {
         height: 250px;
         width: 100%;
-      }
+      } /** Set map container to square shape */
     </style>
 </head>
 <body>
     <div class="chat-container">
       <header class="chat-header">
-        <h1><i class="fas fa-smile"></i> Wemoo</h1>
+        <h1><i class="fas fa-smile"></i> Wemoo</h1> <!--Main header-->
         <a id="leave-btn" class="btn">Leave Room</a>
       </header>
       <main class="chat-main">
         <div class="chat-sidebar">
-          <h3><i class="fas fa-comments"></i> Room Name:</h3>
+          <h3><i class="fas fa-comments"></i> Room Name:</h3> <!--Create headers in sidebar-->
           <h2 id="room-name"></h2>
           <h3><i class="fas fa-users"></i> Users</h3>
           <ul id="users"></ul>
-          <ul id="map" class="map-container"></ul> <!-- Placing map container within the ul -->
+          <h3><i class="fas fa-map"></i> Map</h3>
+          <ul id="map" class="map-container"></ul> 
         </div>
         <div class="chat-messages"></div>
       </main>
@@ -69,7 +70,7 @@
         map = new google.maps.Map(document.getElementById('map'), {
           center: { lat: 0, lng: 0 },
           zoom: 2,
-        });
+        }); // Center map practically nowhere to show location not yet found
 
         getUserLocation();
       }
@@ -97,15 +98,15 @@
         map = new google.maps.Map(document.getElementById('map'), {
           center: userPos,
           zoom: 17,
-        });
+        }); //Center map on user location
 
         // Create a bubble around the user's location
         const userCircle = new google.maps.Circle({
           strokeColor: '#0088ff',
-          strokeOpacity: 0.8,
+          strokeOpacity: 0.8, 
           strokeWeight: 2,
           fillColor: '#0088ff',
-          fillOpacity: 0.35,
+          fillOpacity: 0.35, // Make inner bubble opaque
           map: map,
           center: userPos,
           radius: 20, // Specify the radius of the bubble in meters
@@ -125,7 +126,7 @@
 
       function loadMapScript() {
         var script = document.createElement("script");
-        script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDm-ArKttbnMcFJn5glWhrjMJZXHQU0DTQ&callback=initMap&v=weekly&solution_channel=GMP_CCS_geolocation_v1";
+        script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDm-ArKttbnMcFJn5glWhrjMJZXHQU0DTQ&callback=initMap&v=weekly&solution_channel=GMP_CCS_geolocation_v1"; // API Key I had to register & create
         script.defer = true;
         document.body.appendChild(script);
       }
