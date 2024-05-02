@@ -10,8 +10,12 @@ const { username, room } = Qs.parse(location.search, {
 
 const socket = io();
 
-// Join chatroom
-socket.emit('joinRoom', { username, room });
+// Extract the uuid from the URL path
+const uuid = window.location.pathname.split('/')[2];
+
+// Use the uuid to join the chat room
+socket.emit('joinRoom', {username: uuid, room: 'Gallogly Hall' });
+
 
 // Get room and users
 socket.on('roomUsers', ({ room, users }) => {
@@ -98,8 +102,8 @@ socket.on('roomUsers', ({ room, users }) => {
 });
 
 
-// Send users and room info
-io.to(user.room).emit("roomUsers", {
-  room: user.room,
-  users: getRoomUsers(user.room),
-});
+// // Send users and room info
+// io.to(user.room).emit("roomUsers", {
+//   room: user.room,
+//   users: getRoomUsers(user.room),
+// });

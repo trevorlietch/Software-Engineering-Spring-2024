@@ -9,7 +9,7 @@
       integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk="
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="/css/style.css" />
     <title>Wemoo App</title>
   </head>
   <body>
@@ -48,5 +48,14 @@
     ></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/main.js"></script>
+    <script>
+      const socket = io();
+  
+      // Get UUID from URL
+      const uuid = window.location.pathname.split('/').pop();
+  
+      // Emit 'joinRoom' event with UUID and room
+      socket.emit('joinRoom', { uuid: uuid, room: 'general' });
+    </script>
   </body>
 </html>

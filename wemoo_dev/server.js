@@ -92,7 +92,13 @@ let transporter = nodemailer.createTransport({
   }
 });
 
+app.get('/chat/:uuid', (req, res) => {
+  // Extract the uuid from the URL
+  const uuid = req.params.uuid;
 
+  // Serve the chat.html file
+  res.sendFile(path.join(__dirname, 'public', 'chat.html'));
+});
 
 
 // Add max user limit
@@ -101,7 +107,9 @@ const MAX_USERS_PER_ROOM = 100;
 
 // Run when client connects
 io.on("connection", (socket) => {
-  socket.on("joinRoom", ({ username, room }) => {
+  socket.on("joinRoom", ({uuid, room }) => {
+    console.log(`User ${uuid} connected to room ${room}`)
+
     const roomUsers = getRoomUsers(room);
   
     // Add max user limit
@@ -110,10 +118,20 @@ io.on("connection", (socket) => {
       socket.emit("message", formatMessage(botName, "Sorry, this room is full. Please try another one."));
       return;
     }
-  
-    const user = userJoin(socket.id, username, room);
-  
-    socket.join(user.room);
+
+
+    let email;
+    db.get(`SELECT email FROM users WHERE uuid = ?`, [uuid], (err, row) => {
+      if (err) {
+        return console.error(err.message);
+      }
+      email = row.email;
+
+      // Rest of your code...
+      const user = userJoin(socket.id, email, room);
+      socket.join(user.room);
+      // ...
+    
   
     // Welcome current user
     socket.emit("message", formatMessage(botName, "Welcome to Wemoo!"));
@@ -134,14 +152,9 @@ io.on("connection", (socket) => {
 
   });
 
-  // Add uuid based chat pages
-  app.get('/chat/:uuid', (req, res) => {
-    // Extract the uuid from the URL
-    const uuid = req.params.uuid;
-  
-    // Render the chat page
-    res.render('chat', { uuid });
   });
+
+  
   
 
 let lastMessageTimestamps = {};
