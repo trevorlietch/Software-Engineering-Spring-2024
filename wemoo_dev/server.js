@@ -149,6 +149,7 @@ io.on("connection", (socket) => {
       room: user.room,
       users: getRoomUsers(user.room),
     });
+    console.log(`User ${uuid} connected to room ${room}`)
 
   });
 
