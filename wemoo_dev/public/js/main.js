@@ -3,6 +3,16 @@ const chatMessages = document.querySelector('.chat-messages');
 const roomName = document.getElementById('room-name');
 const userList = document.getElementById('users');
 
+//MINI GAME FUNCTION HERE -----------------------------------------------------------------------
+
+let spaceBarPress = false
+
+function normalize(val, max, min) { 
+  if(max - min === 0) return 0; // or 0, it's up to you
+  return (val - min) / (max - min); 
+}
+
+//------------------------------------------------------------------------------------------
 // Get username and room from URL
 const { username, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
@@ -93,6 +103,66 @@ document.getElementById('leave-btn').addEventListener('click', () => {
   }
 });
 
+//MINI GAME STUFF ---------------------------------------------------------
+
+socket.on("test", () => {
+  socket.emit('testreturn')
+})
+
+socket.on('updateCounter', (counterValue,max) => {
+  // Update the counter value on the client side
+
+  //document.getElementById('counter-value').innerText = counterValue;
+  barText = document.getElementById('bar-text')
+
+  if (counterValue < (max*0.2)){
+    barText.innerText = "RED TEAM IS WINNING!!!"
+    barText.style.color = "red";
+  } 
+  else if (counterValue > (max - max*0.2)){
+    barText.innerText = "BLUE TEAM IS WINNING!!!"
+    barText.style.color = "blue";
+  }
+  else {
+    barText.innerText = "";
+  }
+
+  val = normalize(counterValue,max,0)
+
+  // Set the width of the team bars
+  document.getElementById('blue-team-bar').style.width = (val*100) + '%'
+  document.getElementById('red-team-bar').style.width = (100 - val*100) + '%'
+});
+
+socket.on("teamcount", ({red,blue}) => {
+  socket.emit('teamtestreturn')
+  document.getElementById('blue-team-count').innerText = blue;
+  document.getElementById('red-team-count').innerText = red;
+})
+
+/*
+document.getElementById('increment-btn').addEventListener('click', () => {
+  socket.emit('buttonClick');
+});*/
+
+document.addEventListener('keydown', (event) => {
+  // Check if the pressed key is the space bar and it's not already pressed
+  if (event.key === ' ' && !spaceBarPressed) {
+    spaceBarPressed = true; // Set the flag to true
+    // Emit a custom event to the server to indicate that the space bar was pressed
+    socket.emit('buttonClick');
+  }
+});
+
+// Add event listener for keyup event on the document
+document.addEventListener('keyup', (event) => {
+  // Check if the released key is the space bar
+  if (event.key === ' ') {
+    spaceBarPressed = false; // Set the flag to false when space bar is released
+  }
+});
+
+//---------------------------------------------------------
 
 //Add user count for room
 socket.on('roomUsers', ({ room, users }) => {
