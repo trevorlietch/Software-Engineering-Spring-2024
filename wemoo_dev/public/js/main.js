@@ -5,6 +5,12 @@ const userList = document.getElementById('users');
 
 //MINI GAME FUNCTION HERE -----------------------------------------------------------------------
 
+//This code is just a global variable that keeps track of when the space bar is pressed. This
+//is not very secure and should be changed in future versions, as this variable could easily 
+//be removed using a modified client.
+
+//We also have a simple normalization function that will be used later for the incoming game score. 
+
 let spaceBarPressed = false
 
 function normalize(val, max, min) { 
@@ -110,6 +116,14 @@ document.getElementById('leave-btn').addEventListener('click', () => {
 });
 
 //MINI GAME STUFF ---------------------------------------------------------
+
+//Here we have test functions similar to those on server side. 
+
+//We also have a routine for when the counter for the score is updated, which starts with 
+//first the logic for the score bar at the top, such as how it is drawn, and when it prompts
+//the user that one side is winning over the other. 
+
+//We use the normalization function to format the received score. 
 
 socket.on("test", () => {
   socket.emit('testreturn')
