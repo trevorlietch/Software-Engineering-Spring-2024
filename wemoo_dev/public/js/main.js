@@ -18,14 +18,20 @@ const { username, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
 });
 
+// const socket = io();
+
+// // // Extract the uuid from the URL path
+// // const uuid = window.location.pathname.split('/')[2];
+
+// // // Use the uuid to join the chat room
+// // socket.emit('joinRoom', {username: uuid, room: 'Gallogly Hall' });
 const socket = io();
 
-// Extract the uuid from the URL path
-const uuid = window.location.pathname.split('/')[2];
+// Get UUID from URL
+const uuid = window.location.pathname.split('/').pop();
 
-// Use the uuid to join the chat room
-socket.emit('joinRoom', {username: uuid, room: 'Gallogly Hall' });
-
+// Emit 'joinRoom' event with UUID and room
+socket.emit('joinRoom', { uuid: uuid, room: 'Gallogly Hall' });
 
 // Get room and users
 socket.on('roomUsers', ({ room, users }) => {

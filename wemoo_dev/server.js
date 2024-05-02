@@ -162,11 +162,17 @@ io.on("connection", (socket) => {
       if (err) {
         return console.error(err.message);
       }
+      if (!row) {
+        console.error(`No user found with uuid: ${uuid}`);
+        return;
+      }
       email = row.email;
+      console.log(`Email found: ${email}`);
 
       // Rest of your code...
       const user = userJoin(socket.id, email, room);
       socket.join(user.room);
+      console.log("Users in room: ", getRoomUsers(user.room));
       // ...
     
   
@@ -228,7 +234,7 @@ io.on("connection", (socket) => {
       room: user.room,
       users: getRoomUsers(user.room),
     });
-    console.log(`User ${uuid} connected to room ${room}`)
+    console.log(`User ${uuid} connected to room ${room} sucess`)
 
   });
 
