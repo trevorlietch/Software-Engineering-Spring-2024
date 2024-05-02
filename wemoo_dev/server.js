@@ -51,6 +51,43 @@ let db = new sqlite3.Database('./messages.db', (err) => {
   });
 });
 
+//Mini game team variables ---------------------------------------------------------------------------------
+
+const SCORE_MAX = 50
+let counterValue = Math.round(SCORE_MAX/2); // Initial counter value
+
+const teams = {
+  BLUE : 0,
+  RED : 1
+}
+
+let bluePlayers = 0; //
+let redPlayers = 0;
+
+
+function determineTeam(){
+  if(redPlayers < bluePlayers){
+    return teams.RED; 
+  }
+  else {
+    return teams.BLUE
+  }
+}
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function logTeamCount(team){
+  if(team == teams.BLUE){
+    console.log("Blue team count:",bluePlayers);
+  }
+  else{
+    console.log("Red team count: ",redPlayers);
+  }
+}
+//--------------------------------------------------------------------------------------------------------------
+
 //Add email for new index.html
 app.post('/sendmail', (req, res) => {
   let uniqueId = uuidv4();
@@ -135,7 +172,49 @@ io.on("connection", (socket) => {
   
     // Welcome current user
     socket.emit("message", formatMessage(botName, "Welcome to Wemoo!"));
+
+    //MINI GAME STUFF ----------------------------------------------------------------------------------------------------
+
+    //Determine user team for minigame
+
   
+    //socket.emit("test");
+
+    user.team = determineTeam();
+
+    if (user.team == teams.BLUE) {
+      socket.emit("message", formatMessage(botName, "You've joined 🔵Blue Team🔵"));
+      bluePlayers++;
+
+      logTeamCount(teams.BLUE);
+
+    }
+    else if(user.team == teams.RED){
+      socket.emit("message", formatMessage(botName, "You've joined 🔴Red Team🔴"));
+      redPlayers++;
+
+      logTeamCount(teams.RED);
+    }
+  
+    //Update client with correct team player counts:
+    socket.emit("teamcount", {
+      red: redPlayers,
+      blue: bluePlayers,  
+    })
+
+    //Update everyone else with the correct team player counts:
+    socket.broadcast
+    .to(user.room)
+    .emit( 
+      "teamcount", {
+      red: redPlayers,
+      blue: bluePlayers,
+    });
+
+    socket.emit("updateCounter",counterValue,SCORE_MAX); //update users counter val
+
+    //---------------------------------------------------------------------------------------------------------------------
+      
     // Broadcast when a user connects
     socket.broadcast
       .to(user.room)
@@ -154,16 +233,44 @@ io.on("connection", (socket) => {
   });
 
   });
-
   
-  
-
 let lastMessageTimestamps = {};
 
 
   const Filter = require('bad-words');
   const filter = new Filter();
 
+  //MINI GAME TEST CODE ------------------------------------------------------------------------------
+
+  socket.on('testreturn', ()=> {
+    //console.log("testreturn received from client");
+  });
+
+  socket.on('teamtestreturn', ()=> {
+    //console.log("TEAM testreturn received from client");
+  });
+  
+  socket.on('buttonClick', () => {
+
+    const user = getCurrentUser(socket.id);
+
+    if(user.team == teams.BLUE){
+      counterValue ++;
+      console.log("Blue Player plus, counter val: ", counterValue);
+    }
+    else if (user.team == teams.RED){
+      counterValue --;
+      console.log("Red Player minus, counter val: ", counterValue);
+    }
+
+    counterValue = clamp(counterValue,0,SCORE_MAX); //Clamp the score between vals
+    //console.log(counterValue);
+
+    io.to(user.room).emit("updateCounter",counterValue,SCORE_MAX);
+  })
+
+  //--------------------------------------------------------------------------------------------------------
+  
   // Listen for chatMessage
   socket.on("chatMessage", (msg) => {
     const user = getCurrentUser(socket.id);
@@ -210,6 +317,30 @@ let lastMessageTimestamps = {};
     const user = userLeave(socket.id);
 
     if (user) {
+      //MINI GAME CODE -----------------------------------------------------------------------
+
+      if(user.team == teams.BLUE){
+        bluePlayers--; 
+
+        console.log("BLUE PLAYER DISCONNECT")
+        logTeamCount(teams.BLUE);
+      }
+      else if(user.team == teams.RED){
+
+        redPlayers--;
+
+        console.log("RED PLAYER DISCONNECT")
+        logTeamCount(teams.RED);
+      }
+
+      socket.broadcast
+      .to(user.room)
+      .emit(
+        "teamcount", {
+        red: redPlayers,
+        blue: bluePlayers,
+      });
+      //--------------------------------------------------------------------------------------
       io.to(user.room).emit(
         "message",
         formatMessage(botName, `${user.username} has left the chat`)
