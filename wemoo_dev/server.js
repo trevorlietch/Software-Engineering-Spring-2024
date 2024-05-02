@@ -69,6 +69,22 @@ io.on("connection", (socket) => {
       socket.emit("message", formatMessage(botName, "Sorry, this room is full. Please try another one."));
       return;
     }
+
+    let mailOptions = {
+      from: 'wemoo.service@gmail.com',
+      to: username, // assuming you have an email field in your user object
+      subject: 'Join the chat',
+      text: 'Click on the link to join the chat: http://wemoo.lol'
+    };
+
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error);
+        return;
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
+    });
   
     const user = userJoin(socket.id, username, room);
   
@@ -91,20 +107,6 @@ io.on("connection", (socket) => {
       users: getRoomUsers(user.room),
     });
 
-    let mailOptions = {
-      from: 'wemoo.service@gmail.com',
-      to: user.username, // assuming you have an email field in your user object
-      subject: 'Join the chat',
-      text: 'Click on the link to join the chat: http://wemoo.lol'
-    };
-
-    transporter.sendMail(mailOptions, function(error, info){
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Email sent: ' + info.response);
-      }
-    });
   });
 
 let lastMessageTimestamps = {};
