@@ -5,7 +5,7 @@ const userList = document.getElementById('users');
 
 //MINI GAME FUNCTION HERE -----------------------------------------------------------------------
 
-let spaceBarPress = false
+let spaceBarPressed = false
 
 function normalize(val, max, min) { 
   if(max - min === 0) return 0; // or 0, it's up to you
