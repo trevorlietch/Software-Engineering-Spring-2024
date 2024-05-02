@@ -1,14 +1,17 @@
 <!DOCTYPE html>
-<!--
- @license
- Copyright 2019 Google LLC. All Rights Reserved.
- SPDX-License-Identifier: Apache-2.0
- DISCLAIMER: This code is from Google's API to implement their maps software. 
- The user tracking and positioning, as well as the map view elements to increase/decrease
- the view range, were implemented by Wyatt Paradise
--->
-<html>
-  <head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css"
+      integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk="
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <title>Wemoo App</title>
+
     <style>
       /**
        * @license
@@ -19,57 +22,58 @@
        * Always set the map height explicitly to define the size of the div element
        * that contains the map. 
        */
-      #map {
-        height: 100%;
-      }
-
-      /* Makes the sample page fill the window. */
-      html,
-      body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-
-      .custom-map-control-button {
-        background-color: #fff;
-        border: 0;
-        border-radius: 2px;
-        box-shadow: 0 1px 4px -1px rgba(0, 0, 0, 0.3);
-        margin: 10px;
-        padding: 0 0.5em;
-        font: 400 18px Roboto, Arial, sans-serif;
-        overflow: hidden;
-        height: 40px;
-        cursor: pointer;
-      }
-      .custom-map-control-button:hover {
-        background: rgb(235, 235, 235);
+      .map-container {
+        height: 250px;
+        width: 100%;
       }
     </style>
-    <title>Geolocation</title>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+</head>
+<body>
+    <div class="chat-container">
+      <header class="chat-header">
+        <h1><i class="fas fa-smile"></i> Wemoo</h1>
+        <a id="leave-btn" class="btn">Leave Room</a>
+      </header>
+      <main class="chat-main">
+        <div class="chat-sidebar">
+          <h3><i class="fas fa-comments"></i> Room Name:</h3>
+          <h2 id="room-name"></h2>
+          <h3><i class="fas fa-users"></i> Users</h3>
+          <ul id="users"></ul>
+          <ul id="map" class="map-container"></ul> <!-- Placing map container within the ul -->
+        </div>
+        <div class="chat-messages"></div>
+      </main>
+      <div class="chat-form-container">
+        <form id="chat-form">
+          <input
+            id="msg"
+            type="text"
+            placeholder="Enter Message"
+            required
+            autocomplete="off"
+          />
+          <button class="btn"><i class="fas fa-paper-plane"></i> Send</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.9.2/qs.min.js" integrity="sha256-TDxXjkAUay70ae/QJBEpGKkpVslXaHHayklIVglFRT4=" crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/main.js"></script>
 
     <script>
-      // Global variables to store map and info window instances
-      let map, infoWindow;
-
-      // Global variable to store the selected range
-      let selectedRange = 0;
+      let map;
 
       function initMap() {
-        // Initialize map and info window
-        map = new google.maps.Map(document.getElementById("map"), {
-          center: { lat: 35.207530, lng: -97.44430 },
-          zoom: 17,
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: { lat: 0, lng: 0 },
+          zoom: 2,
         });
-        infoWindow = new google.maps.InfoWindow();
 
-        // Get user's current location
         getUserLocation();
       }
 
-      // Function to get user's current location
       function getUserLocation() {
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
@@ -78,29 +82,38 @@
                 lat: position.coords.latitude,
                 lng: position.coords.longitude,
               };
-
-              // Display user's location on the map
-              const userMarker = new google.maps.Marker({
-                position: userPos,
-                map: map,
-                title: "Your Location",
-              });
-
-              // Center map on user's location
-              map.setCenter(userPos);
+              loadMapWithUserLocation(userPos);
             },
             () => {
-              handleLocationError(true, infoWindow, map.getCenter());
+              handleLocationError(true, map, map.getCenter());
             }
           );
         } else {
-          // Browser doesn't support Geolocation
-          handleLocationError(false, infoWindow, map.getCenter());
+          handleLocationError(false, map, map.getCenter());
         }
       }
 
-      // Function to handle location errors
-      function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+      function loadMapWithUserLocation(userPos) {
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: userPos,
+          zoom: 17,
+        });
+
+        // Create a bubble around the user's location
+        const userCircle = new google.maps.Circle({
+          strokeColor: '#0088ff',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#0088ff',
+          fillOpacity: 0.35,
+          map: map,
+          center: userPos,
+          radius: 20, // Specify the radius of the bubble in meters
+        });
+      }
+
+      function handleLocationError(browserHasGeolocation, map, pos) {
+        var infoWindow = new google.maps.InfoWindow();
         infoWindow.setPosition(pos);
         infoWindow.setContent(
           browserHasGeolocation
@@ -110,69 +123,14 @@
         infoWindow.open(map);
       }
 
-      // Function to update map markers based on selected range
-      function updateMarkers() {
-        // Clear existing markers
-        for (let i = 0; i < userMarkers.length; i++) {
-          userMarkers[i].setMap(null);
-        }
-        userMarkers = [];
-
-        // Update map zoom level and center based on the selected range
-        const userPos = map.getCenter(); // Get the center of the map
-        if (selectedRange === 0) {
-          // If no range is selected, reset to default zoom level
-          map.setZoom(16);
-        } else {
-          // Calculate and set appropriate zoom level based on selected range
-          const zoomLevel = getZoomLevel(selectedRange);
-          map.setZoom(zoomLevel);
-        }
-
-        // Filter and display other users within the selected range
-        for (let i = 0; i < userPositions.length; i++) {
-          const user = userPositions[i];
-          const distance = google.maps.geometry.spherical.computeDistanceBetween(
-            new google.maps.LatLng(user.lat, user.lng),
-            new google.maps.LatLng(userPos.lat(), userPos.lng())
-          );
-          // Convert selected range to meters
-          const selectedRangeMeters = selectedRange * 0.3048;
-          if (distance <= selectedRangeMeters) {
-            // Display user within the selected range
-            const userMarker = new google.maps.Marker({
-              position: user,
-              map: map,
-              title: "Other User",
-            });
-            userMarkers.push(userMarker);
-          }
-        }
+      function loadMapScript() {
+        var script = document.createElement("script");
+        script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDm-ArKttbnMcFJn5glWhrjMJZXHQU0DTQ&callback=initMap&v=weekly&solution_channel=GMP_CCS_geolocation_v1";
+        script.defer = true;
+        document.body.appendChild(script);
       }
 
-
-      // Function to calculate zoom level based on the selected range
-      function getZoomLevel(range) {
-        if (range <= 200) {
-          zoom = 18; // Adjust the zoom level as needed
-        } else if (range <= 750) {
-          zoom = 16; // Adjust the zoom level as needed
-        } else {
-          zoom = 14; // Adjust the zoom level as needed
-        }
-      }
-
-      
-      // Expose the initMap function to the global scope
-      window.initMap = initMap;
+      loadMapScript();
     </script>
-  </head>
-  <body>
-    <div id="map"></div>
-    <!-- Load Google Maps API with callback to initMap -->
-    <script
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDm-ArKttbnMcFJn5glWhrjMJZXHQU0DTQ&callback=initMap&v=weekly&solution_channel=GMP_CCS_geolocation_v1"
-      defer
-    ></script>
-  </body>
+</body>
 </html>
