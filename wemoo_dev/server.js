@@ -53,6 +53,13 @@ let db = new sqlite3.Database('./messages.db', (err) => {
 
 //Mini game team variables ---------------------------------------------------------------------------------
 
+//Here are all the utilities for the mini game portion. In the future it would be good to combine these with some of
+//the other constants at the top of the page. the teams constant is basically just a fill in for an enum since
+//javascript lacks enum functionality out of the box. 
+
+//Determine team ensures security as team assingment is done on the serverside, and the client has no idea which team it is
+// on directly. 
+
 const SCORE_MAX = 50
 let counterValue = Math.round(SCORE_MAX/2); // Initial counter value
 
@@ -179,12 +186,15 @@ io.on("connection", (socket) => {
     // Welcome current user
     socket.emit("message", formatMessage(botName, "Welcome to Wemoo!"));
 
-    //MINI GAME STUFF ----------------------------------------------------------------------------------------------------
+    //MINI GAME CODE ----------------------------------------------------------------------------------------------------
 
-    //Determine user team for minigame
+    //Here is where we actually run our DetermineTeam function, which simply assigns a user a team based on how full
+    //the respective teams are. In the future it would be nice to add more generalized support for more teams. 
 
-  
-    //socket.emit("test");
+    //This specific block of minigame code runs when the user joins, and the new team num count is broadcasted to everyone
+    //to ensure that there isn't any desyncing. 
+
+    //The score value is also updated, to ensure that the users bar is actually in-sync aswell. 
 
     user.team = determineTeam();
 
@@ -247,6 +257,20 @@ let lastMessageTimestamps = {};
   const filter = new Filter();
 
   //MINI GAME TEST CODE ------------------------------------------------------------------------------
+
+  //Here we have a few test functions to ensure that our client can actually receive some of our minigame related event 
+  //emitters. Earlier in development there was alot of grief with these not working, so a more robust testing system 
+  //would be nice. 
+
+  //This is also where the server listens for client space bar clicks. 
+
+  //It would be crucial for the future to implement a limit on how many times a client can click the space bar, to account
+  //for people using automated key pressers. This could potentially crash the server if it were to receive too many space 
+  //bar press packets. 
+
+  //We also re-update the score for everyone when one of these packets is received, similar to what happens when a user joins. 
+  //To avoid code-redundancy and not have so much boilerplate in this file, it would be nice to have a whole separate mini-games
+  //file. 
 
   socket.on('testreturn', ()=> {
     //console.log("testreturn received from client");
@@ -324,6 +348,11 @@ let lastMessageTimestamps = {};
 
     if (user) {
       //MINI GAME CODE -----------------------------------------------------------------------
+  
+      //Here is where we handle the teams and mini-game overhead when a user disconnects. This involves decrementing the team
+      //count based on what team the disconnected user was a part of. 
+
+      //Similar to the other minigame sections, we always update the effected values so it can sync up for other clients. 
 
       if(user.team == teams.BLUE){
         bluePlayers--; 
