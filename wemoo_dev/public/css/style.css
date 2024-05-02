@@ -198,3 +198,52 @@ a {
 		display: none;
 	}
 }
+
+/* mini game bar and stuff */ 
+
+.team-bar-container {
+	position: relative; /* Add position: relative */
+	display: flex;
+	width: 50%;
+	height: 20px; /* Adjust the height as needed */
+	margin-top: 10px; /* Add margin as needed */
+  }
+  
+  .team-bar {
+	height: 100%;
+  }
+  
+  #blue-team-bar {
+	background-color: blue;
+	flex-grow: 1; /* Adjust the width to fill the container */
+  }
+  
+  #red-team-bar {
+	background-color: red;
+	flex-grow: 1; /* Adjust the width to fill the container */
+  }
+  
+  .bar-text {
+	position: absolute;
+	top: -20px;
+	left: 50%;
+	transform: translateX(-50%);
+	font-size: 14px;
+	color: black;
+  }
+  
+  #bar-text-top-left {
+	position: absolute;
+	top: -300px;
+	left: 0;
+	font-size: 12px;
+	color: black;
+  }
+  
+  #bar-text-top-right {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	font-size: 12px;
+	color: black;
+  }
